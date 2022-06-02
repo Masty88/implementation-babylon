@@ -48,10 +48,18 @@ const MyFallback = () => {
 
 const Player=()=>{
     const [input,setInput]=useState('')
+    const [player,setPlayer]= useState(null)
     const scene= useScene();
-    const player=scene.getMeshByName("player1")
     console.log(scene)
+    const onModelLoaded=(model)=>{
+        let playerLoad=model;
+        setPlayer(playerLoad)
+        console.log(player);
+    }
     const onClick=()=>{
+        // const player = scene.getMeshByName("player1");
+        console.log(player.animationGroups[2])
+         // player.animationGroups[2].play();
         setInput(!input);
     }
 
@@ -62,10 +70,11 @@ const Player=()=>{
             player.animationGroups[random].play();
         }
     },[input])
+
     return(
         <>
             <Suspense fallback={<MyFallback/>}>
-                <Model name="player1" rootUrl={'models/hand/'} sceneFilename={'finalidle.glb'} />
+                <Model name="player1" rootUrl={'models/hand/'} sceneFilename={'finalidle.glb'} onModelLoaded={onModelLoaded} />
             </Suspense>
             <adtFullscreenUi name="ui">
                 <rectangle name="rect-1" height="30px" width="90px" thickness={0} cornerRadius={0}>
