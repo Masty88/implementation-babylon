@@ -1,5 +1,5 @@
 import React from 'react';
-import {Vector3} from "@babylonjs/core";
+import {Size as Vector, Vector3} from "@babylonjs/core";
 
 const Camera = (e) => {
     return (

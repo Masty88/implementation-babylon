@@ -1,48 +1,98 @@
-import React, {useContext, useEffect} from 'react';
+import React, {Suspense, useCallback, useContext, useEffect, useState} from 'react';
 import {Color4, HemisphericLight, Texture, Vector3} from "@babylonjs/core";
-import {AssetManagerContext, Engine, Scene, TaskType, useAssetManager, useEngine} from "react-babylonjs";
+import {
+    AssetManagerContext,
+    Engine,
+    Model,
+    Scene,
+    TaskType,
+    useAssetManager, useCanvas,
+    useEngine,
+    useScene
+} from "react-babylonjs";
 import Camera from "./Camera";
 import Light from "./Light";
-import Player from "./Player";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import "@babylonjs/loaders/glTF";
+import {setPlayer} from "../redux/animation/animationSlice";
 
-const modelAssetTasks = [
-    { taskType: TaskType.Mesh, rootUrl: `models/hand/`, sceneFilename: 'finalidle.glb', name: 'hand_1' },
-    { taskType: TaskType.Mesh, rootUrl: `models/hand/`, sceneFilename: 'finalidle.glb', name: 'hand_2' },
-];
 
-const Loader=()=>{
+const Loader=({loading})=>{
     const engine = useEngine();
     useEffect(()=>{
-        engine.displayLoadingUI()
-        setTimeout(()=>{
+        if(loading){
+            engine.displayLoadingUI()
+        }else{
             engine.hideLoadingUI()
-        },1000)
-    },[])
+        }
+    },[loading])
 }
 
+
+const MyFallback = () => {
+    const scene= useScene();
+    console.log(scene)
+    const context = useContext(AssetManagerContext);
+    const eventData = context?.lastProgress?.eventData;
+    return <>
+        <adtFullscreenUi name='ui'>
+            <textBlock text="rendering"/>
+        </adtFullscreenUi>
+    </>
+}
+
+
 const BasicScene = () => {
+    const [input,setInput]=useState('')
+    const scene= useScene()
+    const[loading,SetLoading]= useState(true)
+    const dispatch= useDispatch();
     const {player}= useSelector(state=>state.animation)
+    const onModelLoaded = (model)=>{
+        let mesh=model;
+        dispatch(setPlayer(mesh))
+    }
+    const onClick=()=>{
+        setInput("test");
+        scene.getMeshByName("player1")
+    }
+    useEffect(()=>{
+        if(player){
+            console.log("player loaded", player)
+            SetLoading(false);
+        }
+       // player.animationGroups.stop()
+    },[player])
+
+    useEffect(()=>{
+        if(player){
+            let random= Math.floor(Math.random() * ( 3 - 1 + 1) + 1)
+            console.log(random)
+            player.animationGroups[random].play();
+        }
+    },[input])
+
     return (
         <>
             <Engine antialias={true} adaptToDeviceRatio canvasId="renderCanvas">
-                <Scene clearColor={new Color4(0.2, 0.4, 0.75, 1.0)}>
-                    <Camera/>
-                    <Light/>
-                    <ground name='ground1' width={6} height={6} subdivisions={2} />
-                    <Player/>
-                    <adtFullscreenUi name="ui">
-                            <rectangle name="rect-1" height={0.2} width={0.1} thickness={12} cornerRadius={12}>
+                {loading ? (<Loader loading={loading}/>): (<Loader loading={loading}/> )}
+                    <Scene clearColor={new Color4(0.2, 0.4, 0.75, 1.0)}>
+                        <Camera/>
+                        <Light/>
+                        <ground name='ground1' width={6} height={6}  />
+                        <Suspense fallback={<MyFallback/>}>
+                            <Model name="player1" rootUrl={'models/hand/'} sceneFilename={'finalidle.glb'} onModelLoaded={onModelLoaded} />
+                        </Suspense>
+                        <adtFullscreenUi name="ui">
+                            <rectangle name="rect-1" height="30px" width="90px" thickness={0} cornerRadius={0}>
                                 <rectangle>
-                                    <babylon-button name="close-icon" background="green" onPointerDownObservable={()=>{
-                                        player.loadedAnimationGroups[1].play();
-                                    }} >
-                                        <textBlock text={'\uf00d click me'} fontFamily="FontAwesome" fontStyle="bold" fontSize={10} color="white" />
+                                    <babylon-button name="close-icon" background="green" onPointerDownObservable={()=>{onClick()}} >
+                                        <textBlock text={'INPUT'} fontFamily="FontAwesome" fontStyle="bold" fontSize={10} color="white" />
                                     </babylon-button>
                                 </rectangle>
                             </rectangle>
-                    </adtFullscreenUi>
-                </Scene>
+                        </adtFullscreenUi>
+                    </Scene>
             </Engine>
         </>
     );

@@ -7,9 +7,7 @@ import {setAnimation} from "./redux/animation/animationSlice";
 const App = () => {
 
     return (
-        <>
             <BasicScene/>
-        </>
     );
 };
 

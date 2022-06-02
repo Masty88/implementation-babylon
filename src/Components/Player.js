@@ -1,67 +1,68 @@
-import React, {useMemo, Suspense, useContext, useRef, useEffect} from 'react';
-import {
-    AssetManagerContext,
-    AssetManagerContextProvider,
-    SceneLoaderContext,
-    SceneLoaderContextProvider, TaskType, useAssetManager, useBeforeRender, useEngine,
-    useSceneLoader
-} from "react-babylonjs";
-import "@babylonjs/loaders/glTF";
-import {ActionManager, Vector3} from "@babylonjs/core";
-import {Provider, useDispatch} from "react-redux";
-import {setAnimation, setPlayer} from "../redux/animation/animationSlice";
-import {store} from "../redux/store";
-
-
-//TODO make it dynamic load base on user choice
-const modelAssetTasks = [
-    { taskType: TaskType.Mesh, rootUrl: `models/hand/`, sceneFilename: 'finalidle.glb', name: 'hand_1' },
-    { taskType: TaskType.Mesh, rootUrl: `models/hand/`, sceneFilename: 'finalidle.glb', name: 'hand_2' },
-];
-
-//TODO add idle
-const MyModels = (factory, deps) => {
-    const assetManagerResult= useAssetManager(modelAssetTasks)
-    const dispatch= useDispatch()
-    useMemo(()=>{
-        console.log(assetManagerResult)
-
-        const hand=assetManagerResult.taskNameMap['hand_1'];
-        hand.loadedMeshes[0].position= new Vector3(-2, 0, 0)
-        dispatch(setPlayer(hand));
-
-        const hand2=assetManagerResult.taskNameMap['hand_2'];
-        hand2.loadedMeshes[0].position= new Vector3(2, 0, 0)
-        hand2.loadedMeshes[0].rotation= new Vector3()
-
-    })
-
-    console.log(modelAssetTasks)
-    return null;
-};
-
-const MyFallback = ({engine}) => {
-    const context = useContext(AssetManagerContext);
-    console.log('context in fallback:', context);
-    const eventData = context?.lastProgress?.eventData;
-    console.log(eventData)
-    return <>
-            <adtFullscreenUi name='ui'>
-              <textBlock text="rendering"/>
-           </adtFullscreenUi>
-        </>
-}
-
-const Player=({engine})=>{
-    return(
-        <Provider store={store}>
-        <AssetManagerContextProvider>
-            <Suspense fallback={<MyFallback/>}>
-                <MyModels />
-            </Suspense>
-       </AssetManagerContextProvider>
-        </Provider>
-        )
-}
-
-export default Player;
+// import React, {useMemo, Suspense, useContext, useRef, useEffect, useCallback} from 'react';
+// import {
+//     AssetManagerContext,
+//     AssetManagerContextProvider, Model,
+//     SceneLoaderContext,
+//     SceneLoaderContextProvider, TaskType, useAssetManager, useBeforeRender, useEngine,
+//     useSceneLoader
+// } from "react-babylonjs";
+// import "@babylonjs/loaders/glTF";
+// import {ActionManager, SetValueAction, Vector3} from "@babylonjs/core";
+// import {Provider, useDispatch, useSelector} from "react-redux";
+// import {setAnimation, setPlayer} from "../redux/animation/animationSlice";
+// import {store} from "../redux/store";
+//
+// const MyFallback = () => {
+//     const context = useContext(AssetManagerContext);
+//     const eventData = context?.lastProgress?.eventData;
+//     return <>
+//             <adtFullscreenUi name='ui'>
+//               <textBlock text="rendering"/>
+//            </adtFullscreenUi>
+//         </>
+// }
+//
+//
+//
+// const Player=()=>{
+//     let hand = null;
+//     const handRef = useCallback(node => {
+//                 hand = node;
+//         }, []);
+//
+//     const onModelLoaded = (model)=>{
+//         let mesh=model;
+//         console.log("loademesh:", mesh)
+//         mesh.animationGroups[2].play();
+//     }
+//
+//     const onClick=()=>{
+//         if(hand !== null){
+//             console.log("ref click")
+//         }
+//     }
+//
+//     const onAnimation=(model)=>{
+//         let animation=model.animationGroups;
+//         console.log(animation)
+//     }
+//
+//     return(
+//             <>
+//                 <Suspense fallback={<MyFallback/>}>
+//                     <Model rootUrl={'models/hand/'} sceneFilename={'finalidle.glb'} onModelLoaded={onModelLoaded} />
+//                 </Suspense>
+//                 <adtFullscreenUi name="ui">
+//                     <rectangle name="rect-1" height={0.2} width={0.1} thickness={12} cornerRadius={12}>
+//                         <rectangle>
+//                             <babylon-button name="close-icon" background="green" onPointerDownObservable={onClick} >
+//                                 <textBlock text={'\uf00d click me'} fontFamily="FontAwesome" fontStyle="bold" fontSize={10} color="white" />
+//                             </babylon-button>
+//                         </rectangle>
+//                     </rectangle>
+//                 </adtFullscreenUi>S
+//             </>
+//         )
+// }
+//
+// export default Player;
