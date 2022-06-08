@@ -83,6 +83,7 @@ const BasicScene = () => {
                         <Suspense fallback={<MyFallback/>}>
                             <Model name="player1" rootUrl={'models/hand/'} sceneFilename={'finalidle.glb'} onModelLoaded={onModelLoaded} />
                         </Suspense>
+                        {/*TODO separate gui into a components*/}
                         <adtFullscreenUi name="ui">
                             <rectangle name="rect-1" height="30px" width="90px" thickness={0} cornerRadius={0}>
                                 <rectangle>

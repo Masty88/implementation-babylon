@@ -1,13 +1,12 @@
 import React from 'react';
 import './App.css'
-import BasicScene from "./Components/BasicScene";
-import {useDispatch} from "react-redux";
-import {setAnimation} from "./redux/animation/animationSlice";
+import Game from "./Components/Game";
+
 
 const App = () => {
 
     return (
-            <BasicScene/>
+            <Game/>
     );
 };
 
