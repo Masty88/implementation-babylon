@@ -76,7 +76,7 @@ const BasicScene = () => {
         <>
             <Engine antialias={true} adaptToDeviceRatio canvasId="renderCanvas">
                 {loading ? (<Loader loading={loading}/>): (<Loader loading={loading}/> )}
-                    <Scene clearColor={new Color4(0.2, 0.4, 0.75, 1.0)}>
+                    <Scene cam clearColor={new Color4(0.2, 0.4, 0.75, 1.0)}>
                         <Camera/>
                         <Light/>
                         <ground name='ground1' width={6} height={6}  />
